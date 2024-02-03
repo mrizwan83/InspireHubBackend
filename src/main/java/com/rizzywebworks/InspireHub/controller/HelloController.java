@@ -20,10 +20,15 @@ public class HelloController {
         return "If you see this you are logged in as user " + principal.getEmail()
                 + " User ID:" + principal.getUserId();
     }
+
+    @GetMapping("/admin")
+    public String admin(@AuthenticationPrincipal UserPrincipal principal) {
+        return "If you see this, then you are an ADMIN, User ID: " + principal.getUserId();
+    }
 }
 
 /**
- * Controller class for handling basic greeting and secured endpoint.
+ * Controller class for handling basic greeting and secured endpoints.
  * Utilizes Spring Security's @AuthenticationPrincipal to access authenticated user details.
  *
  * Annotations:
@@ -33,6 +38,7 @@ public class HelloController {
  * Endpoints:
  * - @GetMapping("/"): Returns a simple greeting message.
  * - @GetMapping("/secured"): Returns a message for authenticated users, displaying user details.
+ * - @GetMapping("/admin"): Returns a message for authenticated users with ADMIN role, displaying user details.
  *
  * Usage: Register this class as a component in the Spring application context to handle web requests.
  */
