@@ -26,4 +26,39 @@ class HelloControllerTest {
                 .andExpect(content().string(containsStringIgnoringCase("Hello")));
     }
 
+    @Test
+    void notLoggedIn_shouldNotSeeSecuredEndpoint() throws Exception {
+        api.perform(get("/secured"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    void loggedIn_shouldSeeSecuredEndpoint() throws Exception {
+        api.perform(get("/secured"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsStringIgnoringCase("User ID:1")));
+    }
+
+    @Test
+    void notLoggedIn_shouldNotSeeAdminEndpoint() throws Exception {
+        api.perform(get("/admin"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    void simpleUser_shouldNotSeeAdminEndpoint() throws Exception {
+        api.perform(get("/admin"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithAdminUser
+    void admin_shouldSeeAdminEndpoint() throws Exception {
+        api.perform(get("/admin"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsStringIgnoringCase("User ID: 1")));
+    }
+
 }
