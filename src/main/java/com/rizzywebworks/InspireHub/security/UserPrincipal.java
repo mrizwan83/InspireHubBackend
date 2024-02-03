@@ -1,5 +1,6 @@
 package com.rizzywebworks.InspireHub.security;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,6 +16,9 @@ public class UserPrincipal implements UserDetails {
 
     private final String email;
 
+    @JsonIgnore
+    private final String password;
+
     private final Collection<? extends GrantedAuthority> authorities;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -23,7 +27,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public String getPassword() {
-        return null;
+        return password;
     }
 
     @Override
@@ -63,6 +67,7 @@ public class UserPrincipal implements UserDetails {
  * Fields:
  * - userId: Unique identifier for the user.
  * - email: User's email address.
+ * - password: User's password (JsonIgnore annotation excludes it from JSON serialization).
  * - authorities: Collection of authorities (roles) granted to the user.
  *
  * Methods:
