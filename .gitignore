@@ -7,7 +7,7 @@ build/
 
 # Ignore application.yaml
 application.yml
-src/main/resources/application.yml
+./src/main/resources/application.yml
 
 
 ### STS ###
