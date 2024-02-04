@@ -27,10 +27,6 @@ dependencies {
 
 	implementation 'com.auth0:java-jwt:4.4.0'
 
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.postgresql:postgresql'
-
-
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -40,3 +36,10 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+processResources {
+	filesMatching("**/application.yaml") {
+		expand(project.properties)
+	}
+}
+
