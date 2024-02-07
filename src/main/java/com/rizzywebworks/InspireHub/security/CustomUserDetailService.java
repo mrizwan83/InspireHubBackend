@@ -1,5 +1,6 @@
 package com.rizzywebworks.InspireHub.security;
 
+import com.rizzywebworks.InspireHub.entity.UserEntity;
 import com.rizzywebworks.InspireHub.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,7 +18,7 @@ public class CustomUserDetailService implements UserDetailsService {
     private final UserService userService;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        var user = userService.findByEmail(username).orElseThrow();
+        UserEntity user = userService.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found with email " + username));
 
         return UserPrincipal.builder()
                 .userId(user.getId())
