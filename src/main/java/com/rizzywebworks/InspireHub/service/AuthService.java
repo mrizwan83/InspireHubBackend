@@ -1,11 +1,14 @@
 package com.rizzywebworks.InspireHub.service;
 
+import com.rizzywebworks.InspireHub.model.AuthenticationFailedException;
 import com.rizzywebworks.InspireHub.model.LoginResponse;
 import com.rizzywebworks.InspireHub.security.JwtIssuer;
 import com.rizzywebworks.InspireHub.security.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -19,21 +22,31 @@ public class AuthService {
 
     private final AuthenticationManager authenticationManager;
     public LoginResponse attemptLogin(String email, String password) {
-        var authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, password)
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        var principal = (UserPrincipal) authentication.getPrincipal();
+        try {
+            var authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, password)
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            var principal = (UserPrincipal) authentication.getPrincipal();
 
-        var roles = principal.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
+            var roles = principal.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .toList();
 
-        var token = jwtIssuer.issue(principal.getUserId(), principal.getEmail(), roles);
-        return LoginResponse.builder()
-                .accessToken(token)
-                .build();
+            var token = jwtIssuer.issue(principal.getUserId(), principal.getEmail(), roles);
+            return LoginResponse.builder()
+                    .accessToken(token)
+                    .build();
+        } catch (AuthenticationServiceException e) {
+            // If authentication failed due to service-related issues
+            throw new AuthenticationFailedException("Authentication service error");
+        } catch (AuthenticationException e) {
+            // If authentication failed due to incorrect email or password
+            throw new AuthenticationFailedException("Incorrect email or password");
+        }
     }
+
+
 }
 
 /**

@@ -14,4 +14,5 @@ public interface UserService {
     UserEntity registerUser(RegisterRequest request);
 
     List<User> getAllUsers();
+
 }
