@@ -1,10 +1,7 @@
 package com.rizzywebworks.InspireHub.controller;
 
 import com.rizzywebworks.InspireHub.entity.UserEntity;
-import com.rizzywebworks.InspireHub.model.AuthenticationFailedException;
-import com.rizzywebworks.InspireHub.model.LoginRequest;
-import com.rizzywebworks.InspireHub.model.LoginResponse;
-import com.rizzywebworks.InspireHub.model.RegisterRequest;
+import com.rizzywebworks.InspireHub.model.*;
 import com.rizzywebworks.InspireHub.service.AuthService;
 import com.rizzywebworks.InspireHub.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -45,20 +43,46 @@ public class AuthController {
         }
     }
 
+//    @PostMapping("/register")
+//    public ResponseEntity<Object> registerUser(@RequestBody @Validated RegisterRequest request) {
+//        UserRecord registeredUser = userService.registerUser(request);
+//        // Create a ResponseEntity with OK status and the registered user as body
+////        return ResponseEntity.status(HttpStatus.CREATED).body(registeredUser);
+//
+//        try {
+//            LoginResponse loginResponse = authService.attemptLogin(request.getEmail(), request.getPassword());
+//            return ResponseEntity.ok().body(Map.of("accessToken", loginResponse.getAccessToken()));
+//        } catch (AuthenticationFailedException e) {
+//            // Handle invalid email/password combination
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid email/password combination"));
+//        }
+//    }
+
     @PostMapping("/register")
     public ResponseEntity<Object> registerUser(@RequestBody @Validated RegisterRequest request) {
-        UserEntity registeredUser = userService.registerUser(request);
-        // Create a ResponseEntity with OK status and the registered user as body
-//        return ResponseEntity.status(HttpStatus.CREATED).body(registeredUser);
-
         try {
+            // Register the user
+            UserRecord registeredUser = userService.registerUser(request);
+
+            // Attempt login to generate access token
             LoginResponse loginResponse = authService.attemptLogin(request.getEmail(), request.getPassword());
-            return ResponseEntity.ok().body(Map.of("accessToken", loginResponse.getAccessToken()));
+
+            // Combine user record and access token in the response body
+            Map<String, Object> responseBody = new HashMap<>();
+            responseBody.put("user", registeredUser);
+            responseBody.put("accessToken", loginResponse.getAccessToken());
+
+            // Return the response with OK status
+            return ResponseEntity.ok().body(responseBody);
         } catch (AuthenticationFailedException e) {
-            // Handle invalid email/password combination
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid email/password combination"));
+            // Handle errors from the service layer (e.g., email already exists, invalid password)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            // Handle unexpected errors
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "An error occurred during registration: " + e.getMessage()));
         }
     }
+
 }
 
 /*
