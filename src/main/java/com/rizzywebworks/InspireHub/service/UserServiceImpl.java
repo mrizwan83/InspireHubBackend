@@ -47,9 +47,10 @@ public class UserServiceImpl implements UserService{
         // Create a new UserEntity
         UserEntity user = UserEntity.builder()
                 .email(request.getEmail())
-                .username(request.getUsername())
+
                 // You may need to hash the password here
                 .password(passwordEncoder.encode(request.getPassword()))
+                .username(request.getUsername())
                 .role("ROLE_USER")
                 .build();
 
@@ -71,8 +72,8 @@ public class UserServiceImpl implements UserService{
                 .map(userEntity -> new User(
                         userEntity.getId(),
                         userEntity.getEmail(),
-                        userEntity.getPassword(),
                         userEntity.getUsername(),
+                        userEntity.getPassword(),
                         userEntity.getRole(),
                         userEntity.getExtraInfo()
                 )).toList();
