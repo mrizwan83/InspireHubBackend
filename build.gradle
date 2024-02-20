@@ -36,6 +36,9 @@ dependencies {
 	// PostgreSQL JDBC driver
 	implementation 'org.postgresql:postgresql'
 
+	implementation 'javax.validation:validation-api:2.0.1.Final' // Or the appropriate version
+
+
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

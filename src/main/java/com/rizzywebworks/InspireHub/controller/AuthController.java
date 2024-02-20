@@ -25,12 +25,6 @@ public class AuthController {
     private final AuthService authService;
 
     private final UserService userService;
-//    @PostMapping("/login")
-//    public LoginResponse login(@RequestBody @Validated LoginRequest request) {
-//       return authService.attemptLogin(request.getEmail(), request.getPassword());
-//    }
-    // This is for testing to make sure the JWT is being build correctly with the correct
-    // fields to identify the user
 
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody @Validated LoginRequest request) {
@@ -39,24 +33,9 @@ public class AuthController {
             return ResponseEntity.ok().body(Map.of("accessToken", loginResponse.getAccessToken()));
         } catch (AuthenticationFailedException e) {
             // Handle invalid email/password combination
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid email/password combination"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
         }
     }
-
-//    @PostMapping("/register")
-//    public ResponseEntity<Object> registerUser(@RequestBody @Validated RegisterRequest request) {
-//        UserRecord registeredUser = userService.registerUser(request);
-//        // Create a ResponseEntity with OK status and the registered user as body
-////        return ResponseEntity.status(HttpStatus.CREATED).body(registeredUser);
-//
-//        try {
-//            LoginResponse loginResponse = authService.attemptLogin(request.getEmail(), request.getPassword());
-//            return ResponseEntity.ok().body(Map.of("accessToken", loginResponse.getAccessToken()));
-//        } catch (AuthenticationFailedException e) {
-//            // Handle invalid email/password combination
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid email/password combination"));
-//        }
-//    }
 
     @PostMapping("/register")
     public ResponseEntity<Object> registerUser(@RequestBody @Validated RegisterRequest request) {
@@ -85,17 +64,3 @@ public class AuthController {
 
 }
 
-/*
- Controller class for handling authentication-related endpoints.
- Annotations:
- - @RestController: Indicates that this class contains REST endpoints.
- - @RequiredArgsConstructor: Lombok annotation for generating a constructor with required dependencies.
- Dependencies:
- - AuthService: Service for handling authentication logic.
- Endpoints:
- - @PostMapping("/auth/login"): Initiates the login process by forwarding the request to the
-   AuthService to attempt user authentication. Returns a LoginResponse containing a JWT token.
- Note: The login endpoint is designed to test the correct construction of the JWT with the
-       necessary fields to identify the user.
- Usage: Register this class as a component in the Spring application context to handle authentication requests.
-*/

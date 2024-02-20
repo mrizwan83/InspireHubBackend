@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -30,17 +33,17 @@ public class UserServiceImpl implements UserService{
         try {
             // Check if email already exists
             if (findByEmail(request.getEmail()).isPresent()) {
-                throw new AuthenticationFailedException("Email already exists");
+                throw new AuthenticationFailedException("Email already exists.");
             }
 
             // Perform password validations here if needed
             if (!isValidPassword(request.getPassword())) {
-                throw new AuthenticationFailedException("Invalid password");
+                throw new AuthenticationFailedException("Invalid password, password length must be at least 8 characters.");
             }
 
             // Check if username is unique
             if (userRepository.existsByUsername(request.getUsername())) {
-                throw new AuthenticationFailedException("Username already exists");
+                throw new AuthenticationFailedException("Username already exists.");
             }
 
             // Convert RegisterRequest to UserEntity
@@ -69,17 +72,24 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public List<User> getAllUsers() {
+    public List<UserRecord> getAllUsers() {
         List<UserEntity> userEntities = userRepository.findAll();
         return userEntities.stream()
-                .map(userEntity -> new User(
-                        userEntity.getId(),
-                        userEntity.getEmail(),
-                        userEntity.getUsername(),
-                        userEntity.getPassword(),
-                        userEntity.getRole(),
-                        userEntity.getExtraInfo()
-                )).toList();
+                .map(userMapper::toUserRecord)
+                .collect(Collectors.toList());
     }
+
+    @Override
+    public UserRecord getUserById(Long id) {
+        Optional<UserEntity> userOptional =  userRepository.findById(id);
+
+        if (userOptional.isPresent()){
+            UserEntity userEntity = userOptional.get();
+            return userMapper.toUserRecord(userEntity);
+        }else {
+            throw new AuthenticationFailedException("User not found with ID: " + id);
+        }
+    }
+
 
 }

@@ -3,11 +3,13 @@ package com.rizzywebworks.InspireHub.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor 
 @Builder
@@ -17,22 +19,21 @@ public class TodoEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user;
 
+    @NotBlank
     @Column(nullable = false)
     private String title;
 
+    @NotBlank
     @Column(nullable = false, columnDefinition = "TEXT")
     private String body;
 
+    @NotNull
     @Column(nullable = false)
     private LocalDateTime dueDate;
 
     @Column(nullable = false)
-    private boolean completed;
+    private boolean completed = false;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -50,5 +51,9 @@ public class TodoEntity {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 }
 

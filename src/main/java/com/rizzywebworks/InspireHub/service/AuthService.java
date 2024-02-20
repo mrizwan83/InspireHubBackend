@@ -42,7 +42,7 @@ public class AuthService {
             throw new AuthenticationFailedException("Authentication service error");
         } catch (AuthenticationException e) {
             // If authentication failed due to incorrect email or password
-            throw new AuthenticationFailedException("Incorrect email or password");
+            throw new AuthenticationFailedException("Incorrect email or password. " + e.getMessage());
         }
     }
 
