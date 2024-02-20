@@ -1,6 +1,7 @@
 package com.rizzywebworks.InspireHub.controller;
 
 
+import com.rizzywebworks.InspireHub.model.AuthenticationFailedException;
 import com.rizzywebworks.InspireHub.model.TodoRecord;
 import com.rizzywebworks.InspireHub.model.TodoRequest;
 import com.rizzywebworks.InspireHub.service.TodoService;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/")
@@ -21,33 +23,66 @@ public class TodoController {
     }
 
     @PostMapping("/todos")
-    public ResponseEntity<TodoRecord> createTodo(@RequestBody TodoRequest todoRequest) {
-        TodoRecord createdTodo = todoService.createTodo(todoRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdTodo);
+    public ResponseEntity<Object> createTodo(@RequestBody TodoRequest todoRequest) {
+        try {
+            TodoRecord createdTodo = todoService.createTodo(todoRequest);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdTodo);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "An error occurred while creating the todo"));
+        }
     }
 
     @GetMapping("/todos/{id}")
-    public ResponseEntity<TodoRecord> getTodoById(@PathVariable Long id) {
-        TodoRecord todo = todoService.getTodoById(id);
-        return ResponseEntity.ok().body(todo);
+    public ResponseEntity<Object> getTodoById(@PathVariable Long id) {
+        try {
+            TodoRecord todo = todoService.getTodoById(id);
+            return ResponseEntity.ok(todo);
+        } catch (AuthenticationFailedException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "An error occurred while retrieving the todo"));
+        }
     }
 
     @PutMapping("/todos/{id}")
-    public ResponseEntity<TodoRecord> updateTodo(@PathVariable Long id, @RequestBody TodoRequest todoRequest) {
-        TodoRecord updatedTodo = todoService.updateTodo(id, todoRequest);
-        return ResponseEntity.ok().body(updatedTodo);
+    public ResponseEntity<Object> updateTodo(@PathVariable Long id, @RequestBody TodoRequest todoRequest) {
+        try {
+            TodoRecord updatedTodo = todoService.updateTodo(id, todoRequest);
+            return ResponseEntity.ok(updatedTodo);
+        } catch (AuthenticationFailedException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "An error occurred while updating the todo"));
+        }
     }
 
     @DeleteMapping("/todos/{id}")
-    public ResponseEntity<Void> deleteTodo(@PathVariable Long id) {
-        todoService.deleteTodo(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Object> deleteTodo(@PathVariable Long id) {
+        try {
+            todoService.deleteTodo(id);
+            return ResponseEntity.noContent().build();
+        } catch (AuthenticationFailedException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "An error occurred while deleting the todo"));
+        }
     }
 
     @GetMapping("/users/{userId}/todos")
-    public ResponseEntity<List<TodoRecord>> getTodosByUserId(@PathVariable Long userId) {
-        List<TodoRecord> todos = todoService.getTodosByUserId(userId);
-        return ResponseEntity.ok().body(todos);
+    public ResponseEntity<Object> getTodosByUserId(@PathVariable Long userId) {
+        try {
+            List<TodoRecord> todos = todoService.getTodosByUserId(userId);
+            return ResponseEntity.ok(todos);
+        } catch (AuthenticationFailedException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "An error occurred while retrieving todos for the user"));
+        }
     }
 
 

@@ -2,6 +2,7 @@ package com.rizzywebworks.InspireHub.service;
 
 import com.rizzywebworks.InspireHub.entity.TodoEntity;
 import com.rizzywebworks.InspireHub.entity.UserEntity;
+import com.rizzywebworks.InspireHub.model.AuthenticationFailedException;
 import com.rizzywebworks.InspireHub.model.TodoMapper;
 import com.rizzywebworks.InspireHub.model.TodoRecord;
 import com.rizzywebworks.InspireHub.model.TodoRequest;
@@ -10,7 +11,6 @@ import com.rizzywebworks.InspireHub.repository.UserRepository;
 import com.rizzywebworks.InspireHub.security.UserPrincipal;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -48,22 +48,34 @@ public class TodoServiceImpl implements TodoService{
 
     @Override
     public TodoRecord getTodoById(Long id) {
+        // Retrieve the todos entity by ID
         TodoEntity todoEntity = todoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Todo item not found with id: " + id));
+
+        // Check if the authenticated user owns the todos
+        checkTodoOwnership(todoEntity);
+
+        // If the user owns the todos, map it to a TodoRecord and return it
         return todoMapper.mapToTodoRecord(todoEntity);
     }
 
 
     @Override
     public TodoRecord updateTodo(Long id, TodoRequest todoRequest) {
+        // Retrieve the todos entity by ID
         TodoEntity todoEntity = todoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Todo item not found with id: " + id));
+
+        // Check if the authenticated user owns the todos
+        checkTodoOwnership(todoEntity);
 
         // Update the todos details
         todoEntity.setTitle(todoRequest.getTitle());
         todoEntity.setBody(todoRequest.getBody());
         todoEntity.setDueDate(todoRequest.getDueDate());
         todoEntity.setCompleted(todoRequest.isCompleted());
+        todoEntity.setPriority(todoRequest.getPriority());
+        todoEntity.setStatus(todoRequest.getStatus());
 
         // Save the updated todos entity
         TodoEntity updatedTodo = todoRepository.save(todoEntity);
@@ -75,8 +87,12 @@ public class TodoServiceImpl implements TodoService{
 
     @Override
     public void deleteTodo(Long id) {
+        // Retrieve the todos entity by ID
         TodoEntity todoEntity = todoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Todo item not found with id: " + id));
+
+        // Check if the authenticated user owns the todos
+        checkTodoOwnership(todoEntity);
 
         // Delete the todos entity from the database
         todoRepository.delete(todoEntity);
@@ -85,6 +101,16 @@ public class TodoServiceImpl implements TodoService{
 
     @Override
     public List<TodoRecord> getTodosByUserId(Long userId) {
+        // Get the authenticated user's ID from the SecurityContext
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Long loggedInUserId = ((UserPrincipal) authentication.getPrincipal()).getUserId();
+
+        // Ensure that the requested userId matches the logged-in user's ID
+        if (!userId.equals(loggedInUserId)) {
+            throw new AuthenticationFailedException("Unauthorized access: You can only retrieve your own todos.");
+        }
+
+        // Proceed to fetch the todos for the authenticated user
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
@@ -93,5 +119,16 @@ public class TodoServiceImpl implements TodoService{
                 .map(todoMapper::mapToTodoRecord)
                 .collect(Collectors.toList());
     }
+
+    // Helper method to check if the authenticated user owns the todos
+    private void checkTodoOwnership(TodoEntity todoEntity) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Long loggedInUserId = ((UserPrincipal) authentication.getPrincipal()).getUserId();
+
+        if (!todoEntity.getUser().getId().equals(loggedInUserId)) {
+            throw new AuthenticationFailedException("Unauthorized access: You can only access update or delete your own todos.");
+        }
+    }
+
 
 }

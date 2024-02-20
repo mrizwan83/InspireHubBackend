@@ -32,6 +32,14 @@ public class TodoEntity {
     @Column(nullable = false)
     private LocalDateTime dueDate;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Priority priority;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Status status;
+
     @Column(nullable = false)
     private boolean completed = false;
 

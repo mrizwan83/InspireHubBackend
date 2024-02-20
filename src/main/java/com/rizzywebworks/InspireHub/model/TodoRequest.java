@@ -1,6 +1,8 @@
 package com.rizzywebworks.InspireHub.model;
 
 
+import com.rizzywebworks.InspireHub.entity.Priority;
+import com.rizzywebworks.InspireHub.entity.Status;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,5 +22,10 @@ public class TodoRequest {
 
     private boolean completed;
 
+    @NotNull(message = "Priority is required")
+    private Priority priority;
+
+    @NotNull(message = "Status is required")
+    private Status status;
 }
 
