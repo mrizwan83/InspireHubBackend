@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/apod")
@@ -42,25 +43,18 @@ public class ApodController {
     // Endpoint to get APOD by date
     @GetMapping("/{date}")
     public ResponseEntity<ApodEntity> getApodByDate(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        ApodEntity apodEntity = apodService.getApodByDate(date);
-        if (apodEntity != null) {
-            return new ResponseEntity<>(apodEntity, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        Optional<ApodEntity> apodEntityOptional = apodService.getApodByDate(date);
+        return apodEntityOptional.map(apodEntity -> new ResponseEntity<>(apodEntity, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-
+    //endpoint to get by id
     @GetMapping("/id/{id}")
     public ResponseEntity<ApodEntity> getApodById(@PathVariable Long id) {
-        ApodEntity apodEntity = apodService.getApodById(id);
-        if (apodEntity != null) {
-            return new ResponseEntity<>(apodEntity, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        Optional<ApodEntity> apodEntityOptional = apodService.getApodById(id);
+        return apodEntityOptional.map(apodEntity -> new ResponseEntity<>(apodEntity, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-
 
 
     // Add more endpoints for additional querying methods as needed
