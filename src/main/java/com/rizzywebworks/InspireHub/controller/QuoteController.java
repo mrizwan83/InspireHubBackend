@@ -22,7 +22,10 @@ public class QuoteController {
         try {
             quoteService.fetchAndSaveQuote();
             return ResponseEntity.ok("Quote fetched and saved successfully!");
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+        catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to fetch and save quote: " + e.getMessage());
         }
     }
@@ -51,4 +54,15 @@ public class QuoteController {
         QuoteEntity quote = quoteService.getRandomQuote();
         return ResponseEntity.ok(quote);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteQuote(@PathVariable Long id) {
+        try {
+            quoteService.deleteById(id);
+            return ResponseEntity.ok("Quote with ID " + id + " deleted successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete quote with ID " + id + ": " + e.getMessage());
+        }
+    }
+
 }

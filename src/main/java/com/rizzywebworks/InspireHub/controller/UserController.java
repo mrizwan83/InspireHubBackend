@@ -26,6 +26,10 @@ public class UserController {
     }
 
 
+    //todo: make this for logged in user and remove all users or make it for admin only
+    // update and protected for only the logged in user
+
+
     @GetMapping("/users")
     public List<UserRecord> getAllUsers() {
         return userService.getAllUsers();

@@ -17,4 +17,7 @@ public interface QuoteService {
 
     // Method to retrieve a random quote
     QuoteEntity getRandomQuote();
+
+    void deleteById(Long id);
+
 }

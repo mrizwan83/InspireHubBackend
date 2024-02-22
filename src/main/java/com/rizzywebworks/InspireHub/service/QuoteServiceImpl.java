@@ -9,7 +9,9 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
 import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -20,16 +22,32 @@ public class QuoteServiceImpl implements QuoteService{
 
     // Implement the methods defined in the QuoteService interface
 
-    private final String QUOTE_API_URL = "https://quotes.rest/qod?api_key=BU5vGC0bOsLhrTxM90icEhZ0hdnsma6XLTVgFWej";
-    private final String API_KEY = "api_key";
+
+
+    // Retrieve API key from environment variable
+    private final String QUOTE_API_KEY = System.getenv("QUOTE_API_KEY");
+    private final String QUOTE_API_URL = "https://quotes.rest/qod?api_key=" + QUOTE_API_KEY;
+
+
+
 
     @Override
     public void fetchAndSaveQuote() {
+
+        LocalDate today = LocalDate.now();
+        String formattedDate = today.toString();
+        if (quoteRepository.existsByDate(formattedDate)) {
+            System.out.println("A quote has already been saved for today.");
+            throw new RuntimeException("A quote has already been saved for today.");
+        }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("X-TheySaidSo-Api-Secret", API_KEY);
+        headers.set("X-TheySaidSo-Api-Secret", QUOTE_API_KEY);
+
+        HttpEntity<?> requestEntity = new HttpEntity<>(headers);
 
         ResponseEntity<String> responseEntity = restTemplate.exchange(QUOTE_API_URL, HttpMethod.GET, null, String.class);
+        System.out.println(responseEntity); //
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String responseBody = responseEntity.getBody();
             ObjectMapper objectMapper = new ObjectMapper();
@@ -44,6 +62,8 @@ public class QuoteServiceImpl implements QuoteService{
             System.err.println("Failed to fetch quote of the day. Status code: " + responseEntity.getStatusCodeValue());
         }
     }
+
+
 
 
     private void saveQuoteFromApiResponse(QuoteResponse quoteResponse) {
@@ -78,5 +98,10 @@ public class QuoteServiceImpl implements QuoteService{
     public QuoteEntity getRandomQuote() {
         return quoteRepository.findRandomQuote()
                 .orElseThrow(() -> new RuntimeException("No quotes found in the database."));
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        quoteRepository.deleteById(id);
     }
 }
