@@ -4,11 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -30,23 +31,23 @@ public class WebSecurityConfig {
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         http
-                .cors().disable()
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .formLogin().disable()
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.formLogin().disable()
                 .exceptionHandling()
-                .authenticationEntryPoint(unauthorizedHandler)
-                .and()
-                .securityMatcher("/**")
+                .authenticationEntryPoint(unauthorizedHandler);
+
+                http.securityMatcher("/**")
                 .authorizeHttpRequests(registry -> registry
-                        .requestMatchers("/").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
-//                        .requestMatchers("/api/v1/**").permitAll()
+//                        .requestMatchers("/api/v1/apod/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 );
 
         return http.build();
+
 
     }
 

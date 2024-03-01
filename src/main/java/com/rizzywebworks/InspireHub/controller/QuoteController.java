@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/quotes")
+@RequestMapping("/api/v1/quotes/")
 @RequiredArgsConstructor
 public class QuoteController {
 

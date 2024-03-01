@@ -34,7 +34,7 @@ public class ApodController {
     }
 
     // Endpoint to get all APOD entries
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<List<ApodEntity>> getAllApodEntries() {
         List<ApodEntity> apodEntries = apodService.getAllApodEntries();
         return new ResponseEntity<>(apodEntries, HttpStatus.OK);

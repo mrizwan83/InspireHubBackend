@@ -85,6 +85,9 @@ public class QuoteServiceImpl implements QuoteService{
     }
     @Override
     public List<QuoteEntity> getAllQuotes() {
+
+        System.out.println("QUOTE_API_KEY: " + QUOTE_API_KEY);
+
         return quoteRepository.findAll();
     }
 
