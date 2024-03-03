@@ -40,6 +40,7 @@ public class WebSecurityConfig {
 
                 http.securityMatcher("/**")
                 .authorizeHttpRequests(registry -> registry
+                        .requestMatchers("/").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/v1/apod/fetch").permitAll()
                         .requestMatchers("/api/v1/quotes/fetch").permitAll()

@@ -6,9 +6,9 @@ build/
 !**/src/test/**/build/
 
 # Ignore application.yaml
-application.yml
+
 application-dev.yml
-application-prod.yml
+
 ./src/main/resources/application.yml
 
 
