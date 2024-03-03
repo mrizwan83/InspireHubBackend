@@ -34,12 +34,15 @@ public class ApodServiceImpl implements ApodService {
             JsonNode jsonNode = objectMapper.readTree(responseBody);
             LocalDate date = LocalDate.parse(jsonNode.get("date").asText());
 
+            // Check if the "hdurl" field is present before attempting to access its value
+            String hdUrl = jsonNode.has("hdurl") ? jsonNode.get("hdurl").asText() : null;
+
             // Check if an entry for the same date already exists in the database
             if (!apodRepository.existsByDate(date)) {
                 ApodEntity apodEntity = ApodEntity.builder()
                         .date(date)
                         .explanation(jsonNode.get("explanation").asText())
-                        .hdUrl(jsonNode.get("hdurl").asText())
+                        .hdUrl(hdUrl)
                         .mediaType(jsonNode.get("media_type").asText())
                         .serviceVersion(jsonNode.get("service_version").asText())
                         .title(jsonNode.get("title").asText())
