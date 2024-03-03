@@ -57,7 +57,7 @@ public class QuoteServiceImpl implements QuoteService{
                 System.err.println("Failed to parse API response: " + e.getMessage());
             }
         } else {
-            System.err.println("Failed to fetch quote of the day. Status code: " + responseEntity.getStatusCodeValue());
+            System.err.println("Failed to fetch quote of the day. Status code: " + responseEntity.getStatusCode());
         }
     }
 
