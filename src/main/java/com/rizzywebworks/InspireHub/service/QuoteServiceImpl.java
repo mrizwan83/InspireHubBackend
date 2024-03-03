@@ -47,13 +47,11 @@ public class QuoteServiceImpl implements QuoteService{
         HttpEntity<?> requestEntity = new HttpEntity<>(headers);
 
         ResponseEntity<String> responseEntity = restTemplate.exchange(QUOTE_API_URL, HttpMethod.GET, null, String.class);
-        System.out.println(responseEntity); //
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             String responseBody = responseEntity.getBody();
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 QuoteResponse quoteResponse = objectMapper.readValue(responseBody, QuoteResponse.class);
-                System.out.println(quoteResponse); //
                 saveQuoteFromApiResponse(quoteResponse);
             } catch (Exception e) {
                 System.err.println("Failed to parse API response: " + e.getMessage());
@@ -85,8 +83,6 @@ public class QuoteServiceImpl implements QuoteService{
     }
     @Override
     public List<QuoteEntity> getAllQuotes() {
-
-        System.out.println("QUOTE_API_KEY: " + QUOTE_API_KEY);
 
         return quoteRepository.findAll();
     }

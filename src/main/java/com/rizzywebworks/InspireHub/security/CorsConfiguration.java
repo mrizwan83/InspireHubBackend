@@ -15,7 +15,7 @@ public class CorsConfiguration {
             public void addCorsMappings(CorsRegistry registry) {
 
                 registry.addMapping("/**") //this allows all routes of application
-                        .allowedOrigins("https://www.nasaquotes.com/") // Update this with your frontend URL
+                        .allowedOrigins("https://www.nasaquotes.com/**") // Update this with your frontend URL
                         .allowedMethods("GET", "POST", "PUT", "DELETE");
             }
         };
