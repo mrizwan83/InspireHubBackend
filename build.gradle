@@ -56,7 +56,13 @@ processResources {
 }
 
 // Specify the main class for the JAR manifest
-springBoot {
-	mainClass = 'com.rizzywebworks.InspireHub.InspireHubApplication'
+jar {
+	manifest {
+		attributes(
+				'Main-Class': 'com.rizzywebworks.InspireHub.InspireHubApplication',
+				// Additional manifest attributes if needed
+		)
+	}
 }
+
 
