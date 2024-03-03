@@ -55,3 +55,8 @@ processResources {
 	}
 }
 
+// Specify the main class for the JAR manifest
+springBoot {
+	mainClass = 'com.rizzywebworks.InspireHub.InspireHubApplication'
+}
+
