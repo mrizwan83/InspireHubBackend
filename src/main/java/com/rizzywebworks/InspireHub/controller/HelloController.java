@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 public class HelloController {
-    @GetMapping("/")
+    @GetMapping("/health")
     public String greeting() {
-        return "Hello, World!";
+        return "Health Check Success!";
     }
 
 
