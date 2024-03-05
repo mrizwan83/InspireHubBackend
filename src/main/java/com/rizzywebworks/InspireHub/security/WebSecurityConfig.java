@@ -33,14 +33,15 @@ public class WebSecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.formLogin().disable()
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .formLogin(AbstractHttpConfigurer::disable)
                 .exceptionHandling()
                 .authenticationEntryPoint(unauthorizedHandler);
 
                 http.securityMatcher("/**")
                 .authorizeHttpRequests(registry -> registry
                         .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/health").permitAll()
                         .requestMatchers("/api/v1/apod/fetch").permitAll()
                         .requestMatchers("/api/v1/quotes/fetch").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
@@ -56,11 +57,13 @@ public class WebSecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        return http.getSharedObject(AuthenticationManagerBuilder.class)
-                .userDetailsService(customUserDetailService)
-                .passwordEncoder(passwordEncoder())
-                .and().build();
+        AuthenticationManagerBuilder authBuilder =  http.getSharedObject(AuthenticationManagerBuilder.class);
+                authBuilder.userDetailsService(customUserDetailService)
+                .passwordEncoder(passwordEncoder());
+                return authBuilder.build();
     }
+
+
 
     private PasswordEncoder passwordEncoder() {
 
